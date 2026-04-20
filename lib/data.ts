@@ -59,7 +59,14 @@ export interface App {
   category: AppCategoryId;
   compatibleModels: CarModelId[];
   downloadUrl: string;
-  source: "Yandex" | "Upstream" | "GitHub" | "GitLab" | "APKMirror" | "Official";
+  source:
+    | "Yandex"
+    | "Upstream"
+    | "GitHub"
+    | "GitLab"
+    | "APKMirror"
+    | "APKPure"
+    | "Official";
   version?: string;
   isMod?: boolean;
   isOfficial?: boolean;
@@ -76,8 +83,9 @@ export const apps: App[] = [
     descriptionAr: "ملاحة مجتمعية مع حركة المرور في الوقت الفعلي",
     category: "navigation",
     compatibleModels: ALL_MODELS,
-    downloadUrl: "https://www.apkmirror.com/apk/waze/waze/",
-    source: "APKMirror",
+    downloadUrl: "https://apkpure.com/pl/waze-navigation-live-traffic/com.waze/download",
+    source: "APKPure",
+    version: "5.17.1.0",
     isOfficial: true,
   },
   {
@@ -143,8 +151,10 @@ export const apps: App[] = [
     descriptionAr: "عميل سبوتيفاي الرسمي لبث الموسيقى",
     category: "music",
     compatibleModels: ALL_MODELS,
-    downloadUrl: "https://www.apkmirror.com/apk/spotify-ab/spotify-music/",
-    source: "APKMirror",
+    downloadUrl:
+      "https://apkpure.com/spotify-music-and-podcasts-for-android-2025/com.spotify.music/download",
+    source: "APKPure",
+    version: "9.1.40.1486",
     isOfficial: true,
   },
   {
@@ -322,9 +332,9 @@ export const apps: App[] = [
     descriptionAr: "مشغل سيارات قابل للتخصيص بشكل كبير",
     category: "launchers",
     compatibleModels: ALL_MODELS,
-    downloadUrl: "https://www.apkmirror.com/apk/carwebguru/carwebguru-launcher/",
-    source: "APKMirror",
-    version: "3.5.9",
+    downloadUrl: "https://apkpure.com/es/carwebguru-car-launcher/com.softartstudio.carwebguru/download",
+    source: "APKPure",
+    version: "3.6.1 R2",
     isOfficial: true,
   },
   {
@@ -334,9 +344,9 @@ export const apps: App[] = [
     descriptionAr: "مشغل سيارات نظيف وسريع مع OBD والطقس",
     category: "launchers",
     compatibleModels: ALL_MODELS,
-    downloadUrl: "https://www.apkmirror.com/apk/alter-games/agama-car-launcher/",
-    source: "APKMirror",
-    version: "5.0.2",
+    downloadUrl: "https://apkpure.com/br/agama-car-launcher/altergames.carlauncher/download",
+    source: "APKPure",
+    version: "5.0.4",
     isOfficial: true,
   },
   {
