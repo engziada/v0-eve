@@ -23,14 +23,15 @@ export function FirmwareSection() {
             DiLink System Updates
           </h2>
           <p className="mx-auto max-w-2xl text-sm text-muted-foreground">
-            Official firmware resources for all DiLink systems from GitHub
-            repositories.
+            Latest firmware picks per model group, resolved only from the shared
+            Yandex archive.
           </p>
           <p
             className="mx-auto mt-1.5 max-w-2xl text-xs text-muted-foreground/80"
             dir="rtl"
           >
-            موارد البرامج الثابتة الرسمية لجميع أنظمة DiLink من مستودعات GitHub
+            أحدث حزم البرامج الثابتة لكل مجموعة موديلات، ومصدرها فقط أرشيف
+            ياندكس المشترك
           </p>
         </div>
 

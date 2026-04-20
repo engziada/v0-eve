@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   apps,
   appCategories,
@@ -44,24 +44,6 @@ export function AppsSection() {
   const [query, setQuery] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  // Sync category filter with URL hash (e.g. #apps-navigation)
-  useEffect(() => {
-    const applyHash = () => {
-      const h = window.location.hash;
-      if (!h.startsWith("#apps")) return;
-      const parts = h.replace("#apps", "").replace(/^-/, "");
-      if (!parts) {
-        setSelectedCategory("all");
-        return;
-      }
-      const match = appCategories.find((c) => c.id === parts);
-      if (match) setSelectedCategory(match.id);
-    };
-    applyHash();
-    window.addEventListener("hashchange", applyHash);
-    return () => window.removeEventListener("hashchange", applyHash);
-  }, []);
-
   const filteredApps = useMemo(() => {
     const q = query.trim().toLowerCase();
     return apps.filter((app) => {
@@ -101,16 +83,6 @@ export function AppsSection() {
 
   return (
     <section id="apps" className="scroll-mt-16">
-      {/* Anchor stubs so navbar links like #apps-navigation select category + scroll */}
-      {appCategories.map((c) => (
-        <span
-          key={c.id}
-          id={`apps-${c.id}`}
-          aria-hidden
-          className="block -mt-16 h-16"
-        />
-      ))}
-
       {/* Section Header */}
       <div className="mx-auto max-w-7xl px-4 pt-10 lg:px-8 lg:pt-16">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -134,122 +106,150 @@ export function AppsSection() {
       </div>
 
       {/* Redesigned Filter Toolbar */}
-      <div className="sticky top-16 z-30 mt-6 border-y border-border/50 bg-background/85 backdrop-blur-xl">
+      <div className="sticky top-16 z-30 mt-6 border-y border-border/50 bg-background/80 backdrop-blur-2xl">
         <div className="mx-auto max-w-7xl px-4 py-3 lg:px-8">
-          {/* Toolbar row */}
-          <div className="flex items-center gap-2">
-            {/* Search */}
-            <div className="relative flex-1">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search apps..."
-                className="h-10 border-border/50 bg-card/50 pl-9 pr-3 text-sm"
-                aria-label="Search apps"
-              />
+          <div className="rounded-2xl border border-border/50 bg-card/60 p-3 shadow-[0_18px_45px_-32px_rgba(0,0,0,0.9)]">
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
+                <div className="relative flex-1">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Search apps, mods, launchers, or tools"
+                    className="h-11 border-border/50 bg-background/70 pl-9 pr-3 text-sm"
+                    aria-label="Search apps"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center">
+                  <div className="rounded-xl border border-border/50 bg-background/60 px-3 py-2 text-center">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                      Showing
+                    </p>
+                    <p className="text-sm font-semibold text-foreground">
+                      {filteredApps.length} results
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => setFiltersOpen((v) => !v)}
+                    className={cn(
+                      "inline-flex h-full min-h-11 items-center justify-center gap-2 rounded-xl border px-3 text-xs font-medium transition-colors",
+                      filtersOpen || hasActiveFilter
+                        ? "border-primary/50 bg-primary/12 text-primary"
+                        : "border-border/50 bg-background/60 text-muted-foreground hover:text-foreground",
+                    )}
+                    aria-expanded={filtersOpen}
+                  >
+                    <SlidersHorizontal className="h-4 w-4" />
+                    <span>Filters</span>
+                    {hasActiveFilter && (
+                      <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+                        {[
+                          selectedModel !== "all",
+                          selectedCategory !== "all",
+                          query.length > 0,
+                        ].filter(Boolean).length}
+                      </span>
+                    )}
+                  </button>
+
+                  {hasActiveFilter && (
+                    <button
+                      onClick={resetFilters}
+                      className="inline-flex min-h-11 items-center justify-center gap-1 rounded-xl border border-border/50 bg-background/60 px-3 text-xs text-muted-foreground transition-colors hover:text-foreground"
+                      aria-label="Clear filters"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                      <span>Clear</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  Jump to
+                </span>
+                {appCategories
+                  .filter((category) => category.id !== "all")
+                  .map((category) => (
+                    <a
+                      key={category.id}
+                      href={`#apps-${category.id}`}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-border/50 bg-background/70 px-3 py-1.5 text-[11px] text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+                    >
+                      {categoryIcons[category.id]}
+                      {category.name}
+                    </a>
+                  ))}
+              </div>
             </div>
 
-            {/* Filter toggle */}
-            <button
-              onClick={() => setFiltersOpen((v) => !v)}
-              className={cn(
-                "inline-flex h-10 items-center gap-2 rounded-md border px-3 text-xs font-medium transition-colors",
-                filtersOpen || hasActiveFilter
-                  ? "border-primary/50 bg-primary/10 text-primary"
-                  : "border-border/50 bg-card/50 text-muted-foreground hover:text-foreground",
-              )}
-              aria-expanded={filtersOpen}
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              <span className="hidden sm:inline">Filters</span>
-              {hasActiveFilter && (
-                <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
-                  {[
-                    selectedModel !== "all",
-                    selectedCategory !== "all",
-                    query.length > 0,
-                  ].filter(Boolean).length}
-                </span>
-              )}
-            </button>
+            {/* Active filter chips (always visible when active) */}
+            {hasActiveFilter && !filtersOpen && (
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {selectedCategory !== "all" && (
+                  <FilterChip
+                    label={
+                      appCategories.find((c) => c.id === selectedCategory)?.name ||
+                      ""
+                    }
+                    icon={categoryIcons[selectedCategory]}
+                    onClear={() => setSelectedCategory("all")}
+                  />
+                )}
+                {selectedModel !== "all" && (
+                  <FilterChip
+                    label={carModels.find((m) => m.id === selectedModel)?.name || ""}
+                    icon={<Car className="h-3 w-3" />}
+                    onClear={() => setSelectedModel("all")}
+                  />
+                )}
+              </div>
+            )}
 
-            {hasActiveFilter && (
-              <button
-                onClick={resetFilters}
-                className="inline-flex h-10 items-center gap-1 rounded-md border border-border/50 bg-card/50 px-3 text-xs text-muted-foreground transition-colors hover:text-foreground"
-                aria-label="Clear filters"
-              >
-                <X className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Clear</span>
-              </button>
+            {/* Collapsible filter panel */}
+            {filtersOpen && (
+              <div className="mt-3 grid gap-3 border-t border-border/40 pt-3 lg:grid-cols-[1.35fr_1fr]">
+                <div className="rounded-2xl border border-border/40 bg-background/50 p-3">
+                  <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    Category
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {appCategories.map((category) => (
+                      <FilterPill
+                        key={category.id}
+                        active={selectedCategory === category.id}
+                        icon={categoryIcons[category.id]}
+                        onClick={() => setSelectedCategory(category.id)}
+                      >
+                        {category.name}
+                      </FilterPill>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-border/40 bg-background/50 p-3">
+                  <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    Car Model
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {carModels.map((model) => (
+                      <FilterPill
+                        key={model.id}
+                        active={selectedModel === model.id}
+                        onClick={() => setSelectedModel(model.id)}
+                      >
+                        {model.name}
+                      </FilterPill>
+                    ))}
+                  </div>
+                </div>
+              </div>
             )}
           </div>
-
-          {/* Active filter chips (always visible when active) */}
-          {hasActiveFilter && !filtersOpen && (
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {selectedCategory !== "all" && (
-                <FilterChip
-                  label={
-                    appCategories.find((c) => c.id === selectedCategory)?.name ||
-                    ""
-                  }
-                  icon={categoryIcons[selectedCategory]}
-                  onClear={() => setSelectedCategory("all")}
-                />
-              )}
-              {selectedModel !== "all" && (
-                <FilterChip
-                  label={carModels.find((m) => m.id === selectedModel)?.name || ""}
-                  icon={<Car className="h-3 w-3" />}
-                  onClear={() => setSelectedModel("all")}
-                />
-              )}
-            </div>
-          )}
-
-          {/* Collapsible filter panel */}
-          {filtersOpen && (
-            <div className="mt-3 space-y-3 border-t border-border/40 pt-3">
-              {/* Category chips */}
-              <div>
-                <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
-                  Category
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {appCategories.map((category) => (
-                    <FilterPill
-                      key={category.id}
-                      active={selectedCategory === category.id}
-                      icon={categoryIcons[category.id]}
-                      onClick={() => setSelectedCategory(category.id)}
-                    >
-                      {category.name}
-                    </FilterPill>
-                  ))}
-                </div>
-              </div>
-
-              {/* Car model chips */}
-              <div>
-                <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
-                  Car Model
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {carModels.map((model) => (
-                    <FilterPill
-                      key={model.id}
-                      active={selectedModel === model.id}
-                      onClick={() => setSelectedModel(model.id)}
-                    >
-                      {model.name}
-                    </FilterPill>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
@@ -269,7 +269,11 @@ export function AppsSection() {
           Object.entries(groupedApps).map(([categoryId, categoryApps]) => {
             const category = appCategories.find((c) => c.id === categoryId);
             return (
-              <div key={categoryId} className="mb-10 last:mb-0">
+              <div
+                key={categoryId}
+                id={`apps-${categoryId}`}
+                className="mb-10 scroll-mt-40 last:mb-0"
+              >
                 <div className="mb-4 flex items-center gap-3">
                   <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
                     {categoryIcons[categoryId]}

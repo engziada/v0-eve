@@ -47,7 +47,7 @@ export function Navbar() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56">
               <DropdownMenuItem asChild>
-                <Link href="#apps-all">All Apps</Link>
+                <Link href="#apps">All Apps</Link>
               </DropdownMenuItem>
               {appCategories
                 .filter((c) => c.id !== "all")
@@ -94,7 +94,7 @@ export function Navbar() {
                 Apps
               </p>
               <Link
-                href="#apps-all"
+                href="#apps"
                 className="block rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-secondary"
                 onClick={closeMobile}
               >

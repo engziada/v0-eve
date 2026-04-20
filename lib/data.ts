@@ -1,6 +1,6 @@
-// Yandex base share URL used as a fallback for APKs/firmware that don't have a newer upstream source
-const YANDEX = "https://disk.yandex.ru/d/SxXwb0bgy0Ll_w";
-const y = (p: string) => `${YANDEX}/${p.split("/").map(encodeURIComponent).join("/")}`;
+// Stable download routes. Yandex files are resolved server-side so the UI
+// doesn't rely on expiring downloader.disk.yandex.ru URLs.
+const y = (p: string) => `/api/download?provider=yandex&path=${encodeURIComponent(`/${p}`)}`;
 
 // ---------------------------------------------------------------------------
 // Car models (referenced by apps and firmware)
@@ -59,7 +59,7 @@ export interface App {
   category: AppCategoryId;
   compatibleModels: CarModelId[];
   downloadUrl: string;
-  source: "Yandex" | "Upstream" | "GitHub" | "APKMirror" | "Official";
+  source: "Yandex" | "Upstream" | "GitHub" | "GitLab" | "APKMirror" | "Official";
   version?: string;
   isMod?: boolean;
   isOfficial?: boolean;
@@ -168,8 +168,9 @@ export const apps: App[] = [
     descriptionAr: "يوتيوب ميوزيك مع تعديلات — بدون إعلانات",
     category: "music",
     compatibleModels: ALL_MODELS,
-    downloadUrl: "https://revanced.net/download/youtube-music",
-    source: "Upstream",
+    downloadUrl: y("Soft/RuSoft/Youtube and music/music-revanced-v5.41.50-arm64-v8a.apk"),
+    source: "Yandex",
+    version: "5.41.50",
     isMod: true,
     warning: "Requires microG to sign in",
     warningAr: "يتطلب microG لتسجيل الدخول",
@@ -204,7 +205,7 @@ export const apps: App[] = [
     descriptionAr: "مشغل موسيقى احترافي مع موازن متقدم",
     category: "music",
     compatibleModels: ALL_MODELS,
-    downloadUrl: "https://powerampapp.com/downloads/",
+    downloadUrl: "https://forum.powerampapp.com/files/category/2-poweramp-v3-latest-releases/",
     source: "Official",
     isOfficial: true,
   },
@@ -260,8 +261,9 @@ export const apps: App[] = [
     descriptionAr: "يوتيوب معدل مع حجب إعلانات وتشغيل في الخلفية",
     category: "video",
     compatibleModels: ALL_MODELS,
-    downloadUrl: "https://revanced.net/",
-    source: "Upstream",
+    downloadUrl: y("Soft/RuSoft/Youtube and music/youtube-revanced-v18.15.40-all.apk"),
+    source: "Yandex",
+    version: "18.15.40",
     isMod: true,
     warning: "Requires microG for Google login",
     warningAr: "يتطلب microG لتسجيل الدخول بحساب جوجل",
@@ -273,8 +275,10 @@ export const apps: App[] = [
     descriptionAr: "الأداة الرسمية لبناء تطبيقات ReVanced",
     category: "video",
     compatibleModels: ALL_MODELS,
-    downloadUrl: "https://github.com/ReVanced/revanced-manager/releases/latest",
+    downloadUrl:
+      "https://github.com/ReVanced/revanced-manager/releases/download/v2.5.1/revanced-manager-2.5.1.apk",
     source: "GitHub",
+    version: "2.5.1",
   },
   {
     id: "tencent-video",
@@ -348,12 +352,13 @@ export const apps: App[] = [
   {
     id: "dudu-autoui",
     name: "DuduAutoUi BYD",
-    description: "Customized BYD UI tweaks (multiple builds)",
+    description: "Customized BYD UI tweaks (latest known stable build from Yandex)",
     descriptionAr: "تعديلات واجهة BYD",
     category: "launchers",
     compatibleModels: ALL_MODELS,
-    downloadUrl: y("Soft/China software/DuduAutoUi BYD"),
+    downloadUrl: y("Soft/China software/DuduAutoUi BYD/DuduAutoUi比亚迪专享版1.008005.apk"),
     source: "Yandex",
+    version: "1.008005",
   },
   {
     id: "wallpaper-apk",
@@ -374,8 +379,10 @@ export const apps: App[] = [
     descriptionAr: "بديل مفتوح المصدر لخدمات جوجل",
     category: "tools",
     compatibleModels: ALL_MODELS,
-    downloadUrl: "https://github.com/microg/GmsCore/releases/latest",
+    downloadUrl:
+      "https://github.com/microg/GmsCore/releases/download/v0.3.13.250932/org.microg.gms-250932026-user.apk",
     source: "GitHub",
+    version: "0.3.13.250932",
     warning: "Required for ReVanced YouTube login",
     warningAr: "مطلوب لتسجيل الدخول في ReVanced YouTube",
   },
@@ -386,8 +393,9 @@ export const apps: App[] = [
     descriptionAr: "بديل مجهول لمتجر جوجل بلاي",
     category: "tools",
     compatibleModels: ALL_MODELS,
-    downloadUrl: "https://gitlab.com/AuroraOSS/AuroraStore/-/releases",
-    source: "GitHub",
+    downloadUrl:
+      "https://gitlab.com/AuroraOSS/AuroraStore/-/releases/4.8.1/downloads/AuroraStore-4.8.1.apk",
+    source: "GitLab",
     version: "4.8.1",
   },
   {
@@ -408,9 +416,10 @@ export const apps: App[] = [
     descriptionAr: "مدير حزم متقدم مع ميزات الروت",
     category: "tools",
     compatibleModels: ALL_MODELS,
-    downloadUrl: "https://github.com/MuntashirAkon/AppManager/releases/latest",
+    downloadUrl:
+      "https://github.com/MuntashirAkon/AppManager/releases/download/v4.0.5/AppManager_v4.0.5.apk",
     source: "GitHub",
-    version: "3.1.0",
+    version: "4.0.5",
   },
   {
     id: "xplore",
@@ -528,8 +537,10 @@ export const apps: App[] = [
     descriptionAr: "منظف نظام لإزالة بقايا التطبيقات",
     category: "tools",
     compatibleModels: ALL_MODELS,
-    downloadUrl: "https://github.com/d4rken-org/sdmaid-se/releases/latest",
+    downloadUrl:
+      "https://github.com/d4rken-org/sdmaid-se/releases/download/v1.7.1-rc0/eu.darken.sdmse-v1.7.1-rc0-10701000-FOSS-RELEASE.apk",
     source: "GitHub",
+    version: "1.7.1-rc0",
     isOfficial: true,
   },
   {
@@ -539,8 +550,10 @@ export const apps: App[] = [
     descriptionAr: "مدير ملفات محسّن لسيارات BYD",
     category: "tools",
     compatibleModels: ALL_MODELS,
-    downloadUrl: "https://anexplorer.io/device/android-automotive/byd",
+    downloadUrl:
+      "https://raw.githubusercontent.com/1hakr/data/master/apps/files/otherAutoFree-release.apk",
     source: "Official",
+    version: "5.8.7",
     isOfficial: true,
   },
 
@@ -592,16 +605,6 @@ export const apps: App[] = [
   },
 
   // ---------------- Beta Zone ----------------
-  {
-    id: "byd-apps-ota",
-    name: "BYD Apps & OTA Channel",
-    description: "Experimental builds & newest APKs (Telegram)",
-    descriptionAr: "نسخ تجريبية وأحدث التطبيقات (تليجرام)",
-    category: "beta",
-    compatibleModels: ALL_MODELS,
-    downloadUrl: "https://t.me/just_byd",
-    source: "Upstream",
-  },
   {
     id: "clash-beta",
     name: "Clash",
@@ -746,9 +749,13 @@ export const firmwares: Firmware[] = [
     description: "Dedicated firmware for Leopard 8",
     descriptionAr: "برنامج مخصص لليوبارد 8",
     compatibleModels: ["leopard"],
-    downloadUrl: y("Firmware Dilink/By the list/Di5.1/Leopard 8"),
-    version: "Leopard 8 folder",
+    downloadUrl:
+      y(
+        "Firmware Dilink/By the list/Di5.1/Leopard 8/Di5.1_34.1.17.2501044.1.34.2.5.2501040.2.zip",
+      ),
+    version: "34.1.17.2501044",
     chipset: "34.x",
+    releaseDate: "2025-01",
   },
   {
     id: "di6-latest",
