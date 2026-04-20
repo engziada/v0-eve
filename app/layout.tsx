@@ -7,8 +7,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'BYD Egypt EV Hub - Apps, Firmware & Community',
-  description: 'Your trusted source for BYD head unit apps, mod APKs, stock firmware, and launchers. Organized by car model and category for the Egyptian BYD EV community.',
+  title: 'Egypt-EV by Z Solutions - BYD Apps, Firmware & Community',
+  description: 'Your trusted source for BYD head unit apps, mod APKs, stock firmware, launchers, and community resources for the Egyptian EV community.',
   generator: 'v0.app',
   icons: {
     icon: [
