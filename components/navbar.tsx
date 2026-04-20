@@ -10,16 +10,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { navItems, appCategories, carModels } from "@/lib/data";
+import { navItems, appCategories } from "@/lib/data";
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const closeMobile = () => setMobileMenuOpen(false);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 lg:px-8">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="#top" className="flex items-center gap-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
             <Zap className="h-5 w-5 text-primary-foreground" />
           </div>
@@ -43,36 +45,15 @@ export function Navbar() {
                 <ChevronDown className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48">
+            <DropdownMenuContent align="start" className="w-56">
               <DropdownMenuItem asChild>
-                <Link href="#apps">All Apps</Link>
+                <Link href="#apps-all">All Apps</Link>
               </DropdownMenuItem>
               {appCategories
                 .filter((c) => c.id !== "all")
                 .map((category) => (
                   <DropdownMenuItem key={category.id} asChild>
-                    <Link href={`#apps?category=${category.id}`}>
-                      {category.name}
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {/* Car Models Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="gap-1 text-sm">
-                Car Models
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48">
-              {carModels
-                .filter((m) => m.id !== "all")
-                .map((model) => (
-                  <DropdownMenuItem key={model.id} asChild>
-                    <Link href={`#apps?model=${model.id}`}>{model.name}</Link>
+                    <Link href={`#apps-${category.id}`}>{category.name}</Link>
                   </DropdownMenuItem>
                 ))}
             </DropdownMenuContent>
@@ -93,6 +74,7 @@ export function Navbar() {
           size="icon"
           className="lg:hidden"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Toggle menu"
         >
           {mobileMenuOpen ? (
             <X className="h-5 w-5" />
@@ -112,9 +94,9 @@ export function Navbar() {
                 Apps
               </p>
               <Link
-                href="#apps"
+                href="#apps-all"
                 className="block rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-secondary"
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={closeMobile}
               >
                 All Apps
               </Link>
@@ -123,30 +105,11 @@ export function Navbar() {
                 .map((category) => (
                   <Link
                     key={category.id}
-                    href={`#apps?category=${category.id}`}
+                    href={`#apps-${category.id}`}
                     className="block rounded-lg px-3 py-2 text-sm text-foreground/80 transition-colors hover:bg-secondary"
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={closeMobile}
                   >
                     {category.name}
-                  </Link>
-                ))}
-            </div>
-
-            {/* Car Models Section */}
-            <div className="space-y-1 pt-2">
-              <p className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Car Models
-              </p>
-              {carModels
-                .filter((m) => m.id !== "all")
-                .map((model) => (
-                  <Link
-                    key={model.id}
-                    href={`#apps?model=${model.id}`}
-                    className="block rounded-lg px-3 py-2 text-sm text-foreground/80 transition-colors hover:bg-secondary"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {model.name}
                   </Link>
                 ))}
             </div>
@@ -160,7 +123,7 @@ export function Navbar() {
                     key={item.id}
                     href={item.href}
                     className="block rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={closeMobile}
                   >
                     {item.name}
                   </Link>
