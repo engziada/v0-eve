@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useState, useMemo } from "react";
 import {
   apps,
   appCategories,
@@ -9,73 +9,32 @@ import {
   type AppCategoryId,
 } from "@/lib/data";
 import { AppCard } from "./app-card";
-import {
-  Package,
-  Navigation,
-  Music,
-  Play,
-  Settings,
-  Layout,
-  FlaskConical,
-  MessageCircle,
-  Car,
-  Search,
-  SlidersHorizontal,
-  X,
-} from "lucide-react";
+import { Package, Navigation, Music, Play, Settings, Layout, FlaskConical } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
 
 const categoryIcons: Record<string, React.ReactNode> = {
   all: <Package className="h-4 w-4" />,
   navigation: <Navigation className="h-4 w-4" />,
   music: <Music className="h-4 w-4" />,
   video: <Play className="h-4 w-4" />,
-  launchers: <Layout className="h-4 w-4" />,
   tools: <Settings className="h-4 w-4" />,
-  carplay: <Car className="h-4 w-4" />,
-  communication: <MessageCircle className="h-4 w-4" />,
+  launchers: <Layout className="h-4 w-4" />,
   beta: <FlaskConical className="h-4 w-4" />,
 };
 
 export function AppsSection() {
   const [selectedModel, setSelectedModel] = useState<CarModelId>("all");
   const [selectedCategory, setSelectedCategory] = useState<AppCategoryId>("all");
-  const [query, setQuery] = useState("");
-  const [filtersOpen, setFiltersOpen] = useState(false);
-
-  // Sync category filter with URL hash (e.g. #apps-navigation)
-  useEffect(() => {
-    const applyHash = () => {
-      const h = window.location.hash;
-      if (!h.startsWith("#apps")) return;
-      const parts = h.replace("#apps", "").replace(/^-/, "");
-      if (!parts) {
-        setSelectedCategory("all");
-        return;
-      }
-      const match = appCategories.find((c) => c.id === parts);
-      if (match) setSelectedCategory(match.id);
-    };
-    applyHash();
-    window.addEventListener("hashchange", applyHash);
-    return () => window.removeEventListener("hashchange", applyHash);
-  }, []);
 
   const filteredApps = useMemo(() => {
-    const q = query.trim().toLowerCase();
     return apps.filter((app) => {
       const matchesModel =
         selectedModel === "all" || app.compatibleModels.includes(selectedModel);
       const matchesCategory =
         selectedCategory === "all" || app.category === selectedCategory;
-      const matchesQuery =
-        !q ||
-        app.name.toLowerCase().includes(q) ||
-        app.description.toLowerCase().includes(q);
-      return matchesModel && matchesCategory && matchesQuery;
+      return matchesModel && matchesCategory;
     });
-  }, [selectedModel, selectedCategory, query]);
+  }, [selectedModel, selectedCategory]);
 
   const groupedApps = useMemo(() => {
     if (selectedCategory !== "all") {
@@ -83,173 +42,67 @@ export function AppsSection() {
     }
     return filteredApps.reduce(
       (acc, app) => {
-        (acc[app.category] ||= []).push(app);
+        if (!acc[app.category]) {
+          acc[app.category] = [];
+        }
+        acc[app.category].push(app);
         return acc;
       },
-      {} as Record<string, typeof filteredApps>,
+      {} as Record<string, typeof filteredApps>
     );
   }, [filteredApps, selectedCategory]);
 
-  const hasActiveFilter =
-    selectedModel !== "all" || selectedCategory !== "all" || query.length > 0;
-
-  const resetFilters = () => {
-    setSelectedModel("all");
-    setSelectedCategory("all");
-    setQuery("");
-  };
-
   return (
     <section id="apps" className="scroll-mt-16">
-      {/* Anchor stubs so navbar links like #apps-navigation select category + scroll */}
-      {appCategories.map((c) => (
-        <span
-          key={c.id}
-          id={`apps-${c.id}`}
-          aria-hidden
-          className="block -mt-16 h-16"
-        />
-      ))}
+      {/* Sticky Filter Bar */}
+      <div className="sticky top-16 z-40 border-b border-border/50 bg-background/90 backdrop-blur-xl">
+        <div className="mx-auto max-w-7xl px-4 py-4 lg:px-8">
+          {/* Car Model Filter */}
+          <div className="mb-3">
+            <h3 className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Car Model
+            </h3>
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
+              {carModels.map((model) => (
+                <button
+                  key={model.id}
+                  onClick={() => setSelectedModel(model.id)}
+                  className={cn(
+                    "rounded-full border px-3 py-1 text-xs font-medium transition-all sm:px-4 sm:py-1.5 sm:text-sm",
+                    selectedModel === model.id
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border/50 bg-card/50 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                  )}
+                >
+                  {model.name}
+                </button>
+              ))}
+            </div>
+          </div>
 
-      {/* Section Header */}
-      <div className="mx-auto max-w-7xl px-4 pt-10 lg:px-8 lg:pt-16">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          {/* Category Filter */}
           <div>
-            <p className="mb-2 text-xs font-medium uppercase tracking-[0.2em] text-primary">
-              Applications
-            </p>
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Head-unit APK Library
-            </h2>
-            <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-              Direct APK downloads sourced from trusted mirrors. Play Store does
-              not run on BYD head units.
-            </p>
-          </div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span className="inline-flex h-2 w-2 animate-pulse rounded-full bg-primary" />
-            {apps.length} apps indexed
-          </div>
-        </div>
-      </div>
-
-      {/* Redesigned Filter Toolbar */}
-      <div className="sticky top-16 z-30 mt-6 border-y border-border/50 bg-background/85 backdrop-blur-xl">
-        <div className="mx-auto max-w-7xl px-4 py-3 lg:px-8">
-          {/* Toolbar row */}
-          <div className="flex items-center gap-2">
-            {/* Search */}
-            <div className="relative flex-1">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search apps..."
-                className="h-10 border-border/50 bg-card/50 pl-9 pr-3 text-sm"
-                aria-label="Search apps"
-              />
+            <h3 className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Category
+            </h3>
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
+              {appCategories.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-all sm:px-4 sm:py-1.5 sm:text-sm",
+                    selectedCategory === category.id
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border/50 bg-card/50 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                  )}
+                >
+                  {categoryIcons[category.id]}
+                  {category.name}
+                </button>
+              ))}
             </div>
-
-            {/* Filter toggle */}
-            <button
-              onClick={() => setFiltersOpen((v) => !v)}
-              className={cn(
-                "inline-flex h-10 items-center gap-2 rounded-md border px-3 text-xs font-medium transition-colors",
-                filtersOpen || hasActiveFilter
-                  ? "border-primary/50 bg-primary/10 text-primary"
-                  : "border-border/50 bg-card/50 text-muted-foreground hover:text-foreground",
-              )}
-              aria-expanded={filtersOpen}
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              <span className="hidden sm:inline">Filters</span>
-              {hasActiveFilter && (
-                <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
-                  {[
-                    selectedModel !== "all",
-                    selectedCategory !== "all",
-                    query.length > 0,
-                  ].filter(Boolean).length}
-                </span>
-              )}
-            </button>
-
-            {hasActiveFilter && (
-              <button
-                onClick={resetFilters}
-                className="inline-flex h-10 items-center gap-1 rounded-md border border-border/50 bg-card/50 px-3 text-xs text-muted-foreground transition-colors hover:text-foreground"
-                aria-label="Clear filters"
-              >
-                <X className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Clear</span>
-              </button>
-            )}
           </div>
-
-          {/* Active filter chips (always visible when active) */}
-          {hasActiveFilter && !filtersOpen && (
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {selectedCategory !== "all" && (
-                <FilterChip
-                  label={
-                    appCategories.find((c) => c.id === selectedCategory)?.name ||
-                    ""
-                  }
-                  icon={categoryIcons[selectedCategory]}
-                  onClear={() => setSelectedCategory("all")}
-                />
-              )}
-              {selectedModel !== "all" && (
-                <FilterChip
-                  label={carModels.find((m) => m.id === selectedModel)?.name || ""}
-                  icon={<Car className="h-3 w-3" />}
-                  onClear={() => setSelectedModel("all")}
-                />
-              )}
-            </div>
-          )}
-
-          {/* Collapsible filter panel */}
-          {filtersOpen && (
-            <div className="mt-3 space-y-3 border-t border-border/40 pt-3">
-              {/* Category chips */}
-              <div>
-                <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
-                  Category
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {appCategories.map((category) => (
-                    <FilterPill
-                      key={category.id}
-                      active={selectedCategory === category.id}
-                      icon={categoryIcons[category.id]}
-                      onClick={() => setSelectedCategory(category.id)}
-                    >
-                      {category.name}
-                    </FilterPill>
-                  ))}
-                </div>
-              </div>
-
-              {/* Car model chips */}
-              <div>
-                <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
-                  Car Model
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {carModels.map((model) => (
-                    <FilterPill
-                      key={model.id}
-                      active={selectedModel === model.id}
-                      onClick={() => setSelectedModel(model.id)}
-                    >
-                      {model.name}
-                    </FilterPill>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
@@ -262,7 +115,7 @@ export function AppsSection() {
             </div>
             <h3 className="mb-2 text-base font-semibold">No apps found</h3>
             <p className="text-sm text-muted-foreground">
-              Try adjusting your filters or search query.
+              Try adjusting your filters to find compatible apps.
             </p>
           </div>
         ) : (
@@ -275,7 +128,7 @@ export function AppsSection() {
                     {categoryIcons[categoryId]}
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold">{category?.name}</h3>
+                    <h2 className="text-lg font-semibold">{category?.name}</h2>
                     <p className="text-xs text-muted-foreground" dir="rtl">
                       {category?.nameAr}
                     </p>
@@ -295,58 +148,5 @@ export function AppsSection() {
         )}
       </div>
     </section>
-  );
-}
-
-/* ---------- internal UI helpers ---------- */
-
-function FilterPill({
-  active,
-  onClick,
-  icon,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  icon?: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-all",
-        active
-          ? "border-primary bg-primary text-primary-foreground"
-          : "border-border/50 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground",
-      )}
-    >
-      {icon}
-      {children}
-    </button>
-  );
-}
-
-function FilterChip({
-  label,
-  icon,
-  onClear,
-}: {
-  label: string;
-  icon?: React.ReactNode;
-  onClear: () => void;
-}) {
-  return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/10 px-2.5 py-1 text-[11px] text-primary">
-      {icon}
-      {label}
-      <button
-        onClick={onClear}
-        className="ml-0.5 rounded-full p-0.5 hover:bg-primary/20"
-        aria-label={`Remove ${label} filter`}
-      >
-        <X className="h-2.5 w-2.5" />
-      </button>
-    </span>
   );
 }
