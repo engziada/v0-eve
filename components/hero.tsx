@@ -3,13 +3,16 @@
 import Image from "next/image";
 import { Zap, Car, Download, Users } from "lucide-react";
 import { apps, firmwares, communityLinks, carModels } from "@/lib/data";
+import { useLanguage } from "@/components/language-provider";
 
 export function Hero() {
+  const { t, language } = useLanguage();
+  
   const stats = [
-    { icon: Download, value: `${apps.length}+`, label: "Apps" },
-    { icon: Car, value: `${carModels.length - 1}`, label: "Car Models" },
-    { icon: Zap, value: `${firmwares.length}+`, label: "Firmware" },
-    { icon: Users, value: `${communityLinks.length}+`, label: "Communities" },
+    { icon: Download, value: `${apps.length}+`, label: t("Apps", "تطبيقات") },
+    { icon: Car, value: `${carModels.length - 1}`, label: t("Car Models", "موديلات") },
+    { icon: Zap, value: `${firmwares.length}+`, label: t("Firmware", "سوفتوير") },
+    { icon: Users, value: `${communityLinks.length}+`, label: t("Communities", "مجتمع") },
   ];
 
   return (
@@ -24,7 +27,7 @@ export function Hero() {
           priority
         />
         {/* Dark overlay */}
-        <div className="absolute inset-0 bg-background/80" />
+        <div className="absolute inset-0 bg-background/50" />
       </div>
 
       {/* Egypt Flag Accent - Horizontal stripes */}
@@ -69,19 +72,11 @@ export function Hero() {
           By Z Solutions
         </p>
 
-        {/* Description */}
-        <p className="mb-4 max-w-xl text-balance text-sm text-muted-foreground sm:text-base">
-          Your trusted source for BYD head unit apps, mod APKs, stock firmware,
-          launchers, and community resources.
-        </p>
-
-        {/* Arabic Description */}
-        <p
-          className="mb-8 max-w-xl text-balance text-sm text-muted-foreground/80"
-          dir="rtl"
-        >
-          مصدرك الموثوق لتطبيقات وحدة BYD والبرامج المعدلة والبرامج الثابتة
-          ومشغلات السيارات وموارد المجتمع
+        {/* Validation */}
+        <p className="mb-4 max-w-xl text-balance text-sm text-foreground/90 sm:text-base font-medium">
+          {language === "en" 
+            ? "Your trusted source for BYD head unit apps, mod APKs, stock firmware, launchers, and community resources."
+            : "مصدرك الموثوق لتطبيقات وحدة BYD والبرامج المعدلة والبرامج الثابتة ومشغلات السيارات وموارد المجتمع."}
         </p>
 
         {/* CTA Buttons */}
@@ -91,14 +86,14 @@ export function Hero() {
             className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 hover:shadow-primary/30 sm:px-6 sm:py-3"
           >
             <Download className="h-4 w-4" />
-            Browse Apps
+            {t("Browse Apps", "تصفح التطبيقات")}
           </a>
           <a
             href="#community"
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-card/50 px-5 py-2.5 text-sm font-semibold text-foreground backdrop-blur-sm transition-all hover:bg-card sm:px-6 sm:py-3"
           >
             <Users className="h-4 w-4" />
-            Join Community
+            {t("Join Community", "الإنضمام للمجتمع")}
           </a>
         </div>
 

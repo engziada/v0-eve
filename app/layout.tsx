@@ -1,10 +1,13 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { GlobalCommand } from "@/components/global-command"
+import { ThemeProvider } from "@/components/theme-provider"
+import { LanguageProvider } from "@/components/language-provider"
 import './globals.css'
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+const geist = Geist({ subsets: ["latin"] });
+const geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: 'Egypt-EV by Z Solutions - BYD Apps, Firmware & Community',
@@ -29,16 +32,23 @@ export const metadata: Metadata = {
   },
 }
 
+export const dynamic = 'force-dynamic';
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="bg-background">
+    <html lang="en" suppressHydrationWarning className={`${geist.className} ${geistMono.className} bg-background`}>
       <body className="font-sans antialiased">
-        {children}
-        {process.env.NODE_ENV === 'production' && <Analytics />}
+        <LanguageProvider>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+            {children}
+            <GlobalCommand />
+            {process.env.NODE_ENV === 'production' && <Analytics />}
+          </ThemeProvider>
+        </LanguageProvider>
       </body>
     </html>
   )

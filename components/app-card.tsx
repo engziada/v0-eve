@@ -24,7 +24,7 @@ export function AppCard({ app }: AppCardProps) {
     .filter(Boolean);
 
   return (
-    <Card className="group relative overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm transition-all hover:border-primary/40 hover:bg-card/80">
+    <Card className="group relative overflow-hidden border-border/50 bg-card/70 transition-all hover:border-primary/40 hover:bg-card/90">
       {/* Subtle glow on hover */}
       <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100">
         <div className="absolute inset-0 rounded-lg bg-gradient-to-b from-primary/5 to-transparent" />
@@ -39,11 +39,29 @@ export function AppCard({ app }: AppCardProps) {
                 <CheckCircle className="h-3.5 w-3.5 shrink-0 text-primary" />
               )}
             </div>
-            {app.version && (
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                v{app.version}
-              </p>
-            )}
+            <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+              {app.version && (
+                <p className="text-xs text-muted-foreground whitespace-nowrap">
+                  v{app.version}
+                </p>
+              )}
+              {app.version && (app.fileSize || app.lastUpdated) && (
+                <span className="text-[10px] text-muted-foreground/40">•</span>
+              )}
+              {app.fileSize && (
+                <p className="text-[10px] font-medium text-muted-foreground whitespace-nowrap bg-muted/40 px-1 rounded-sm">
+                  {app.fileSize}
+                </p>
+              )}
+              {app.fileSize && app.lastUpdated && (
+                <span className="text-[10px] text-muted-foreground/40">•</span>
+              )}
+              {app.lastUpdated && (
+                <p className="text-[10px] text-muted-foreground whitespace-nowrap">
+                  {app.lastUpdated}
+                </p>
+              )}
+            </div>
           </div>
           <div className="flex shrink-0 flex-col items-end gap-1">
             {app.isMod && (

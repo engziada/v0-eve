@@ -1,0 +1,42 @@
+[
+  {
+    "id": "battery-drain-apps",
+    "title": "Why does the 12V battery drain fast while parked?",
+    "titleAr": "البطارية الصغير (12V) بتخلص بسرعة والعربية مركونة ليه؟",
+    "content": "A common cause of 12V battery drain in BYD vehicles is leaving third-party navigation or tracking apps (like Maps, Waze, or OBD-II loggers) running in the background on the head unit. These apps prevent the car's Android system from deep-sleeping. \n\n**Expert Solution:** Always force close heavy apps before exiting the car or use a task killer app.",
+    "contentAr": "أشهر سبب لاستهلاك بطارية الـ 12 فولت (البطارية الصغيرة) في الخلفية هو إنك بتسيب برامج تقيلة زي خرايط جوجل أو Waze شغالة على الشاشة. البرامج دي بتمنع نظام الأندرويد إنه يدخل في وضع السكون الكامل (Deep Sleep).\n\n**حل الخبراء:** اتعود تقفل البرامج دي من الخلفية قبل ما تركن العربية لمدة طويلة.",
+    "keywords": ["battery", "drain", "12v", "parked", "apps", "sleep", "بطارية", "استهلاك", "الخلفية", "سليب"]
+  },
+  {
+    "id": "dilink-force-reboot",
+    "title": "Screen frozen or lagging? How to force reboot DiLink",
+    "titleAr": "الشاشة هنجت أو تقيلة جداً؟ إزاي تعمل ريستارت للشاشة",
+    "content": "If you install an app that freezes the system or causes extreme lag, you don't need to turn the car off and on.\n\n**Expert Solution:** Push and hold down the **volume roller** on the steering wheel or center console for **10 to 15 seconds**. The screen will eventually black out and the BYD logo will appear, completing a hard reset of the Android subsystem without affecting driving.",
+    "contentAr": "لو نزلت برنامج هنج الشاشة أو خلاها تقيلة ومش بتستجيب، مش محتاج تبطل العربية وتشغلها تاني.\n\n**حل الخبراء:** علق إيدك دايس على بكرة الصوت (Volume Roller) لمدة 10 لـ 15 ثانية، الشاشة هتطفي وشعار BYD هيظهر وهتعمل ريستارت لنظام الأندرويد بالكامل من غير ما يأثر على سواقتك.",
+    "keywords": ["reboot", "restart", "freeze", "lag", "screen", "volume", "شاشة", "ريستارت", "تهنيج", "تقيلة", "بكرة الصوت"]
+  },
+  {
+    "id": "usb-debugging-adk",
+    "title": "How to enable USB Debugging for ADB installations",
+    "titleAr": "إزاي تفعل وضع تصحيح أخطاء USB (USB Debugging)؟",
+    "content": "To install certain modded apps or system tweaks, you might need ADB access.\n\n**Expert Solution:** Go to System Settings > DiLink/System Info. Tap the software version text **7 times** quickly. Go back, and you will see 'Developer Options' where you can enable USB Debugging. *Use caution, as granting ADB access can be a security risk.*",
+    "contentAr": "عشان تنزل برامج معينة مش مدعومة أو تعدل في النظام بتحتاج تفعل الـ ADB.\n\n**حل الخبراء:** ادخل على الإعدادات > معلومات النظام (System Info). اضغط على رقم الإصدار (Version) 7 مرات بسرعة. ارجع ورا هتلاقي 'خيارات المطور' (Developer Options) ظهرت. ادخل عليها وفعل USB Debugging.",
+    "keywords": ["adb", "usb", "debugging", "developer", "options", "مطور", "تصحيح", "أخطاء", "برمجة"]
+  },
+  {
+    "id": "app-not-installed-error",
+    "title": "'App Not Installed' error when sideloading APKs",
+    "titleAr": "مشكلة 'التطبيق غير مثبت' (App Not Installed) وأنت بتنزل وتسطب APK",
+    "content": "BYD's DiLink heavily restricts the installation of certain system apps or apps signed with conflicting keyframes.\n\n**Expert Solution:** 1) Try disconnecting from Wi-Fi and Bluetooth during installation. 2) Ensure you are not trying to downgrade a system app without ADB. 3) Check if the APK supports the `armeabi-v7a` or `arm64-v8a` architecture.",
+    "contentAr": "نظام DiLink بتاع BYD بيقفل تسطيب برامج معينة متعارضة مع النظام أو متوقعة بمفاتيح حماية معينة.\n\n**حل الخبراء:** 1) جرب تفصل الواي فاي والبلوتوث وقت التسطيب. 2) اتأكد إنك مش بتعمل داونجريد (تنزيل لإصدار أقدم) لبرنامج سيستم بدون ADB. 3) اتأكد إن الـ APK مخصص لمعالج الشاشة (arm).",
+    "keywords": ["apk", "install", "error", "sideload", "app not installed", "تثبيت", "تطبيق", "غير مثبت", "مشكلة"]
+  },
+  {
+    "id": "default-launcher-reset",
+    "title": "Custom launcher keeps resetting to defaults?",
+    "titleAr": "الشاشة الرئيسية (اللانشر) بترجع للأصلية كل شوية؟",
+    "content": "If you install a launcher (like Nova Launcher or CarWebGuru) and set it to default, BYD's system might revert it on reboot.\n\n**Expert Solution:** You must keep the native BYD launcher enabled in the background and use ADB to map the Home button to your new launcher. Do not freeze the stock launcher completely or the climate controls might glitch.",
+    "contentAr": "لو سطبت لانشر جديد وخليته الافتراضي، نظام BYD ممكن يشيله ويلغيه مع كل ريستارت.\n\n**حل الخبراء:** لازم تسيب اللانشر الأصلي بتاع BYD شغال في الخلفية وتستخدم تطبيق زي Button Mapper أو أمر عبر الـ ADB عشان تغير وظيفة زرار الـ Home. متعملش تجميد (Freeze) كامل للانشر الأصلي عشان ده ممكن يبوظ أزرار التكييف.",
+    "keywords": ["launcher", "nova", "default", "reset", "home", "لانشر", "الرئيسية", "ترسيت", "أصلي"]
+  }
+]

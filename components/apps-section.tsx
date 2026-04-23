@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   apps,
   appCategories,
@@ -25,6 +25,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import { useLanguage } from "@/components/language-provider";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const categoryIcons: Record<string, React.ReactNode> = {
   all: <Package className="h-4 w-4" />,
@@ -43,7 +45,9 @@ export function AppsSection() {
   const [selectedCategory, setSelectedCategory] = useState<AppCategoryId>("all");
   const [query, setQuery] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(false);
-
+  const { language, t, dir } = useLanguage();
+  const [openAccordions, setOpenAccordions] = useState<string[]>([]);
+  
   const filteredApps = useMemo(() => {
     const q = query.trim().toLowerCase();
     return apps.filter((app) => {
@@ -54,7 +58,8 @@ export function AppsSection() {
       const matchesQuery =
         !q ||
         app.name.toLowerCase().includes(q) ||
-        app.description.toLowerCase().includes(q);
+        app.description.toLowerCase().includes(q) ||
+        app.descriptionAr.includes(q);
       return matchesModel && matchesCategory && matchesQuery;
     });
   }, [selectedModel, selectedCategory, query]);
@@ -71,6 +76,15 @@ export function AppsSection() {
       {} as Record<string, typeof filteredApps>,
     );
   }, [filteredApps, selectedCategory]);
+
+  // Sync open accordions when search changes
+  useEffect(() => {
+    if (query.length > 0) {
+      setOpenAccordions(Object.keys(groupedApps));
+    } else {
+      setOpenAccordions([]);
+    }
+  }, [query, groupedApps]);
 
   const hasActiveFilter =
     selectedModel !== "all" || selectedCategory !== "all" || query.length > 0;
@@ -105,89 +119,70 @@ export function AppsSection() {
         </div>
       </div>
 
-      {/* Redesigned Filter Toolbar */}
-      <div className="sticky top-16 z-30 mt-6 border-y border-border/50 bg-background/80 backdrop-blur-2xl">
-        <div className="mx-auto max-w-7xl px-4 py-3 lg:px-8">
-          <div className="rounded-2xl border border-border/50 bg-card/60 p-3 shadow-[0_18px_45px_-32px_rgba(0,0,0,0.9)]">
-            <div className="flex flex-col gap-3">
-              <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
-                <div className="relative flex-1">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search apps, mods, launchers, or tools"
-                    className="h-11 border-border/50 bg-background/70 pl-9 pr-3 text-sm"
-                    aria-label="Search apps"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center">
-                  <div className="rounded-xl border border-border/50 bg-background/60 px-3 py-2 text-center">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                      Showing
-                    </p>
-                    <p className="text-sm font-semibold text-foreground">
-                      {filteredApps.length} results
-                    </p>
-                  </div>
-
-                  <button
-                    onClick={() => setFiltersOpen((v) => !v)}
-                    className={cn(
-                      "inline-flex h-full min-h-11 items-center justify-center gap-2 rounded-xl border px-3 text-xs font-medium transition-colors",
-                      filtersOpen || hasActiveFilter
-                        ? "border-primary/50 bg-primary/12 text-primary"
-                        : "border-border/50 bg-background/60 text-muted-foreground hover:text-foreground",
-                    )}
-                    aria-expanded={filtersOpen}
-                  >
-                    <SlidersHorizontal className="h-4 w-4" />
-                    <span>Filters</span>
-                    {hasActiveFilter && (
-                      <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
-                        {[
-                          selectedModel !== "all",
-                          selectedCategory !== "all",
-                          query.length > 0,
-                        ].filter(Boolean).length}
-                      </span>
-                    )}
-                  </button>
-
-                  {hasActiveFilter && (
-                    <button
-                      onClick={resetFilters}
-                      className="inline-flex min-h-11 items-center justify-center gap-1 rounded-xl border border-border/50 bg-background/60 px-3 text-xs text-muted-foreground transition-colors hover:text-foreground"
-                      aria-label="Clear filters"
-                    >
-                      <X className="h-3.5 w-3.5" />
-                      <span>Clear</span>
-                    </button>
-                  )}
-                </div>
+      {/* Redesigned Filter Toolbar - Optimized for Mobile & HU Browser */}
+      <div className="sticky top-16 z-30 mt-6 border-y border-border/50 bg-background/95 shadow-sm">
+        <div className="mx-auto max-w-7xl px-2 py-2 lg:px-8">
+          <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
+            
+            <div className="flex w-full items-center gap-2 overflow-x-auto pb-1 hide-scrollbar">
+              <div className="relative min-w-[200px] flex-1">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search apps..."
+                  className="h-10 border-border/50 bg-card pl-9 pr-3 text-sm"
+                  aria-label="Search apps"
+                />
               </div>
 
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  Jump to
-                </span>
-                {appCategories
-                  .filter((category) => category.id !== "all")
-                  .map((category) => (
-                    <a
-                      key={category.id}
-                      href={`#apps-${category.id}`}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-border/50 bg-background/70 px-3 py-1.5 text-[11px] text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
-                    >
-                      {categoryIcons[category.id]}
-                      {category.name}
-                    </a>
-                  ))}
+              <div className="flex shrink-0 items-center gap-2">
+                <div className="hidden rounded-xl border border-border/50 bg-card px-3 py-1.5 text-center sm:block">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    Showing
+                  </p>
+                  <p className="text-xs font-semibold text-foreground">
+                    {filteredApps.length}
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => setFiltersOpen((v) => !v)}
+                  className={cn(
+                    "inline-flex h-10 items-center justify-center gap-2 rounded-xl border px-3 text-xs font-medium transition-colors",
+                    filtersOpen || hasActiveFilter
+                      ? "border-primary/50 bg-primary/12 text-primary"
+                      : "border-border/50 bg-card text-muted-foreground hover:text-foreground",
+                  )}
+                  aria-expanded={filtersOpen}
+                >
+                  <SlidersHorizontal className="h-4 w-4" />
+                  <span>Filters</span>
+                  {hasActiveFilter && (
+                    <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+                      {[
+                        selectedModel !== "all",
+                        selectedCategory !== "all",
+                        query.length > 0,
+                      ].filter(Boolean).length}
+                    </span>
+                  )}
+                </button>
+
+                {hasActiveFilter && (
+                  <button
+                    onClick={resetFilters}
+                    className="inline-flex h-10 items-center justify-center gap-1 rounded-xl border border-border/50 bg-card px-3 text-xs text-muted-foreground transition-colors hover:text-foreground"
+                    aria-label="Clear filters"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Clear</span>
+                  </button>
+                )}
               </div>
             </div>
-
-            {/* Active filter chips (always visible when active) */}
+            
+            {/* Active filter chips */}
             {hasActiveFilter && !filtersOpen && (
               <div className="mt-3 flex flex-wrap gap-1.5">
                 {selectedCategory !== "all" && (
@@ -253,6 +248,7 @@ export function AppsSection() {
         </div>
       </div>
 
+
       {/* Apps Grid */}
       <div className="mx-auto max-w-7xl px-4 py-8 lg:px-8 lg:py-12">
         {filteredApps.length === 0 ? (
@@ -260,42 +256,54 @@ export function AppsSection() {
             <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-secondary">
               <Package className="h-7 w-7 text-muted-foreground" />
             </div>
-            <h3 className="mb-2 text-base font-semibold">No apps found</h3>
+            <h3 className="mb-2 text-base font-semibold">{t("No apps found", "لم يتم العثور على تطبيقات")}</h3>
             <p className="text-sm text-muted-foreground">
-              Try adjusting your filters or search query.
+              {t("Try adjusting your filters or search query.", "حاول تعديل الفلاتر أو كلمة البحث.")}
             </p>
           </div>
         ) : (
-          Object.entries(groupedApps).map(([categoryId, categoryApps]) => {
-            const category = appCategories.find((c) => c.id === categoryId);
-            return (
-              <div
-                key={categoryId}
-                id={`apps-${categoryId}`}
-                className="mb-10 scroll-mt-40 last:mb-0"
-              >
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                    {categoryIcons[categoryId]}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold">{category?.name}</h3>
-                    <p className="text-xs text-muted-foreground" dir="rtl">
-                      {category?.nameAr}
-                    </p>
-                  </div>
-                  <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs text-muted-foreground">
-                    {categoryApps.length}
-                  </span>
-                </div>
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {categoryApps.map((app) => (
-                    <AppCard key={app.id} app={app} />
-                  ))}
-                </div>
-              </div>
-            );
-          })
+          <Accordion 
+            type="multiple" 
+            value={openAccordions} 
+            onValueChange={setOpenAccordions}
+            className="w-full space-y-6"
+          >
+            {Object.entries(groupedApps).map(([categoryId, categoryApps]) => {
+              const category = appCategories.find((c) => c.id === categoryId);
+              return (
+                <AccordionItem 
+                  key={categoryId} 
+                  value={categoryId} 
+                  id={`apps-${categoryId}`} 
+                  className="border rounded-2xl bg-card px-4 py-2 scroll-mt-40 shadow-sm"
+                >
+                  <AccordionTrigger className="hover:no-underline py-3">
+                    <div className="flex items-center gap-3 text-left">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                        {categoryIcons[categoryId]}
+                      </div>
+                      <div className="flex-1 mr-4">
+                        <h3 className="text-lg font-semibold">{language === "en" ? category?.name : category?.nameAr}</h3>
+                        <p className="text-xs text-muted-foreground" dir={language === "en" ? "rtl" : "ltr"}>
+                          {language === "en" ? category?.nameAr : category?.name}
+                        </p>
+                      </div>
+                      <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs text-muted-foreground mr-4">
+                        {categoryApps.length}
+                      </span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="pt-4 pb-2 border-t mt-2">
+                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {categoryApps.map((app) => (
+                        <AppCard key={app.id} app={app} />
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              );
+            })}
+          </Accordion>
         )}
       </div>
     </section>
